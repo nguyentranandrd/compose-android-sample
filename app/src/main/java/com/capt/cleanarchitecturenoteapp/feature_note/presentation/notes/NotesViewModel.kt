@@ -2,6 +2,7 @@ package com.capt.cleanarchitecturenoteapp.feature_note.presentation.notes
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.capt.cleanarchitecturenoteapp.core.presentation.BaseViewModel
 import com.capt.cleanarchitecturenoteapp.feature_note.domain.model.Note
