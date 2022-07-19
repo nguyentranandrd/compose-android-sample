@@ -51,7 +51,7 @@ fun NoteScreen(navController: NavController, viewModel: NotesViewModel = hiltVie
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Your note", style = MaterialTheme.typography.h4)
-                IconButton(onClick = { viewModel.onEvent(NotesEvent.ToggleOrderSection) }) {
+                IconButton(onClick = { viewModel.onEvent(NotesViewModel.UIEvent.ToggleOrderSection) }) {
                     Icon(imageVector = Icons.Default.Menu, contentDescription = "Sort")
                 }
             }
@@ -66,7 +66,7 @@ fun NoteScreen(navController: NavController, viewModel: NotesViewModel = hiltVie
                         .padding(vertical = 16.dp),
                     noteOrder = state.noteOrder,
                     onOrderChange = {
-                        viewModel.onEvent(NotesEvent.Order(it))
+                        viewModel.onEvent(NotesViewModel.UIEvent.Order(it))
                     }
                 )
 
@@ -79,14 +79,14 @@ fun NoteScreen(navController: NavController, viewModel: NotesViewModel = hiltVie
                         .clickable {
                             navController.navigate(Screen.AddEditNoteScreen.route + "?noteId=${it.id}&noteColor=${it.color}")
                         }, onDeleteNote = {
-                        viewModel.onEvent(NotesEvent.DeleteNote(it))
+                        viewModel.onEvent(NotesViewModel.UIEvent.DeleteNote(it))
                         scope.launch {
                             val result = scaffoldState.snackbarHostState.showSnackbar(
                                 message = "Note deleted",
                                 actionLabel = "Undo"
                             )
                             if (result == SnackbarResult.ActionPerformed) {
-                                viewModel.onEvent(NotesEvent.RestoreNote)
+                                viewModel.onEvent(NotesViewModel.UIEvent.RestoreNote)
                             }
                         }
                     })

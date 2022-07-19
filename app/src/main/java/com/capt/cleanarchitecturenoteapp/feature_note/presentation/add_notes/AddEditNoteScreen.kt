@@ -22,7 +22,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.capt.cleanarchitecturenoteapp.feature_note.domain.model.Note
 import com.capt.cleanarchitecturenoteapp.feature_note.presentation.add_notes.components.TransparentHintTextField
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -51,10 +50,10 @@ fun AddEditNoteScreen(
         // }, [scaffoldState.snackBarHostState])
         viewModel.eventFlow.collectLatest {
             when (it) {
-                is AddEditNoteViewModel.UiEvent.ShowSnackBar -> {
+                is AddEditNoteViewModel.UIState.ShowSnackBar -> {
                     scaffoldState.snackbarHostState.showSnackbar(message = it.message)
                 }
-                is AddEditNoteViewModel.UiEvent.SaveNote -> {
+                is AddEditNoteViewModel.UIState.BackToNotesScreen -> {
                     navController.navigateUp()
                 }
             }
@@ -65,7 +64,7 @@ fun AddEditNoteScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                viewModel.onEvent(AddEditNoteEvent.SaveNote)
+                viewModel.onEvent(AddEditNoteViewModel.UIEvent.SaveNote)
             }, backgroundColor = MaterialTheme.colors.primary) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Save Note")
             }
@@ -103,7 +102,7 @@ fun AddEditNoteScreen(
                                         animationSpec = tween(durationMillis = 500)
                                     )
                                 }
-                                viewModel.onEvent(AddEditNoteEvent.ChangeColor(colorInt))
+                                viewModel.onEvent(AddEditNoteViewModel.UIEvent.ChangeColor(colorInt))
                             }
                     )
                 }
@@ -113,10 +112,10 @@ fun AddEditNoteScreen(
                 text = titleState.text,
                 hint = titleState.hint,
                 onValueChange = {
-                    viewModel.onEvent(AddEditNoteEvent.EnteredTitle(it))
+                    viewModel.onEvent(AddEditNoteViewModel.UIEvent.EnteredTitle(it))
                 },
                 onFocusChange = {
-                    viewModel.onEvent(AddEditNoteEvent.ChangeTitleFocus(it))
+                    viewModel.onEvent(AddEditNoteViewModel.UIEvent.ChangeTitleFocus(it))
                 },
                 isHintVisible = titleState.isHintVisible,
                 singleLine = true,
@@ -127,10 +126,10 @@ fun AddEditNoteScreen(
                 text = contentState.text,
                 hint = contentState.hint,
                 onValueChange = {
-                    viewModel.onEvent(AddEditNoteEvent.EnteredContent(it))
+                    viewModel.onEvent(AddEditNoteViewModel.UIEvent.EnteredContent(it))
                 },
                 onFocusChange = {
-                    viewModel.onEvent(AddEditNoteEvent.ChangeContentFocus(it))
+                    viewModel.onEvent(AddEditNoteViewModel.UIEvent.ChangeContentFocus(it))
                 },
                 isHintVisible = contentState.isHintVisible,
                 textStyle = MaterialTheme.typography.body1,
@@ -141,9 +140,4 @@ fun AddEditNoteScreen(
         }
     }
 
-}
-
-@Composable
-fun Greeting(name: String){
-    Text(text = "Hello $name")
 }

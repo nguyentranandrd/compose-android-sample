@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.capt.cleanarchitecturenoteapp.feature_note.presentation.util.Screen
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
+var i = 0
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SplashScreen(navController: NavController) {
@@ -32,17 +32,21 @@ fun SplashScreen(navController: NavController) {
 
 //    var scope = rememberCoroutineScope()
 
-
-//    Log.i("TAG", "navigate??")
+//    Log.d("TAG", "navigate??")
 //    if (count == 5) {
 //        scope.launch {
-//            Log.i("TAG", "navigating")
+//            Log.d("TAG", "navigating")
 //            navController.navigate(Screen.NotesScreen.route)
 //        }
 //    }
-    Log.i("TAG", "count 1: $count1")
-    Log.i("TAG", "count 2: $count2")
 
+    Log.d("TAG", "count 1: $count1")
+    Log.d("TAG", "count 2: $count2")
+
+//    SideEffect {
+//        i ++
+//        Log.d("TAG", "i= $i")
+//    }
     LaunchedEffect(true) {
         Log.d("TAG", "First launch")
         repeat(5) {
@@ -53,9 +57,9 @@ fun SplashScreen(navController: NavController) {
                 return@repeat
         }
     }
-    
+
     LaunchedEffect(key1 = count) {
-            Log.i("TAG", "navigate??")
+            Log.d("TAG", "navigate??")
         if (count == 5) {
             navController.navigate(Screen.NotesScreen.route)
         }

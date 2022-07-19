@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-abstract class BaseViewModel<VMEvent, UIEvent> : ViewModel() {
+abstract class BaseViewModel<UIEvent, UIState> : ViewModel() {
 
-    private var _eventFlow = MutableSharedFlow<UIEvent>()
+    private var _eventFlow = MutableSharedFlow<UIState>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     override fun onCleared() {
@@ -15,9 +15,9 @@ abstract class BaseViewModel<VMEvent, UIEvent> : ViewModel() {
         Log.d(javaClass.name, "onCleared...")
     }
 
-    abstract fun onEvent(event: VMEvent)
+    abstract fun onEvent(event: UIEvent)
 
-    protected suspend fun emitUIEvent(uiEvent: UIEvent) {
+    protected suspend fun emitUIEvent(uiEvent: UIState) {
         _eventFlow.emit(uiEvent)
     }
 }

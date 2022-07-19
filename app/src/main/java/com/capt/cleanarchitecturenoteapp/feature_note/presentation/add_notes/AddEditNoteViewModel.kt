@@ -2,6 +2,7 @@ package com.capt.cleanarchitecturenoteapp.feature_note.presentation.add_notes
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -21,7 +22,7 @@ constructor(
     private val getNoteByIdUseCase: GetNoteByIdUseCase,
     private val insertNoteUseCase: InsertNoteUseCase,
     savedStateHandle: SavedStateHandle
-) : BaseViewModel<AddEditNoteEvent, AddEditNoteViewModel.UiEvent>() {
+) : BaseViewModel<AddEditNoteViewModel.UIEvent, AddEditNoteViewModel.UIState>() {
 
     private val _noteTitle = mutableStateOf(
         NoteTextFiledState(
@@ -65,32 +66,32 @@ constructor(
         }
     }
 
-    override fun onEvent(event: AddEditNoteEvent) {
+    override fun onEvent(event: UIEvent) {
         when (event) {
-            is AddEditNoteEvent.EnteredTitle -> {
+            is UIEvent.EnteredTitle -> {
                 _noteTitle.value = noteTitle.value.copy(
                     text = event.value
                 )
             }
-            is AddEditNoteEvent.ChangeTitleFocus -> {
+            is UIEvent.ChangeTitleFocus -> {
                 _noteTitle.value = noteTitle.value.copy(
                     isHintVisible = !event.focusState.isFocused && noteTitle.value.text.isBlank()
                 )
             }
-            is AddEditNoteEvent.EnteredContent -> {
+            is UIEvent.EnteredContent -> {
                 _noteContent.value = noteContent.value.copy(
                     text = event.value
                 )
             }
-            is AddEditNoteEvent.ChangeContentFocus -> {
+            is UIEvent.ChangeContentFocus -> {
                 _noteContent.value = noteContent.value.copy(
                     isHintVisible = !event.focusState.isFocused && noteContent.value.text.isBlank()
                 )
             }
-            is AddEditNoteEvent.ChangeColor -> {
+            is UIEvent.ChangeColor -> {
                 _noteColor.value = event.color
             }
-            is AddEditNoteEvent.SaveNote -> {
+            is UIEvent.SaveNote -> {
                 viewModelScope.launch {
                     try {
                         insertNoteUseCase(
@@ -102,10 +103,10 @@ constructor(
                                 id = currentNoteId
                             )
                         )
-                        emitUIEvent(UiEvent.SaveNote)
+                        emitUIEvent(UIState.BackToNotesScreen)
                     } catch (e: InvalidNoteException) {
                         emitUIEvent(
-                            UiEvent.ShowSnackBar(
+                            UIState.ShowSnackBar(
                                 message = e.message ?: "Couldn't save note"
                             )
                         )
@@ -115,8 +116,18 @@ constructor(
         }
     }
 
-    sealed class UiEvent {
-        data class ShowSnackBar(val message: String) : UiEvent()
-        object SaveNote : UiEvent()
+    sealed class UIState {
+        data class ShowSnackBar(val message: String) : UIState()
+        object BackToNotesScreen : UIState()
     }
+
+    sealed class UIEvent {
+        data class EnteredTitle(val value: String) : UIEvent()
+        data class ChangeTitleFocus(val focusState: FocusState) : UIEvent()
+        data class EnteredContent(val value: String) : UIEvent()
+        data class ChangeContentFocus(val focusState: FocusState) : UIEvent()
+        data class ChangeColor(val color: Int) : UIEvent()
+        object SaveNote : UIEvent()
+    }
+
 }
