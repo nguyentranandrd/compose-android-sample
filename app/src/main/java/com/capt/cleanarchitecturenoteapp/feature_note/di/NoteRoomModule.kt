@@ -1,6 +1,5 @@
 package com.capt.cleanarchitecturenoteapp.feature_note.di
 
-import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.capt.cleanarchitecturenoteapp.feature_note.data.data_source.NoteDao

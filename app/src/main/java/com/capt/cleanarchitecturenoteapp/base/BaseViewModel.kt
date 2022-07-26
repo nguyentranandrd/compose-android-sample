@@ -1,13 +1,13 @@
-package com.capt.cleanarchitecturenoteapp.core.presentation
+package com.capt.cleanarchitecturenoteapp.base
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-abstract class BaseViewModel<UIEvent, UIState> : ViewModel() {
+abstract class BaseViewModel<UIEvent, UIAction> : ViewModel() {
 
-    private var _eventFlow = MutableSharedFlow<UIState>()
+    private var _eventFlow = MutableSharedFlow<UIAction>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     override fun onCleared() {
@@ -17,7 +17,7 @@ abstract class BaseViewModel<UIEvent, UIState> : ViewModel() {
 
     abstract fun onEvent(event: UIEvent)
 
-    protected suspend fun emitUIEvent(uiEvent: UIState) {
+    protected suspend fun emitAction(uiEvent: UIAction) {
         _eventFlow.emit(uiEvent)
     }
 }

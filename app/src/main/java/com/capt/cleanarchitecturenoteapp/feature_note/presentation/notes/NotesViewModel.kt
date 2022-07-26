@@ -1,9 +1,10 @@
 package com.capt.cleanarchitecturenoteapp.feature_note.presentation.notes
 
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import com.capt.cleanarchitecturenoteapp.core.presentation.BaseViewModel
+import com.capt.cleanarchitecturenoteapp.base.BaseViewModel
 import com.capt.cleanarchitecturenoteapp.feature_note.domain.model.Note
 import com.capt.cleanarchitecturenoteapp.feature_note.domain.use_case.DeleteNoteUseCase
 import com.capt.cleanarchitecturenoteapp.feature_note.domain.use_case.GetNotesUseCase
@@ -24,10 +25,11 @@ constructor(
     private val getNotesUseCase: GetNotesUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val insertNoteUseCase: InsertNoteUseCase
-) : BaseViewModel<NotesViewModel.UIEvent, NotesViewModel.UIState>() {
+) : BaseViewModel<NotesViewModel.UIEvent, NotesViewModel.UIAction>() {
 
-    private val _state = mutableStateOf(NoteState())
-    val state: State<NoteState> = _state
+    private var _noteState by mutableStateOf(NotesUiState())
+    val noteState: NotesUiState
+        get() = _noteState
 
     private var recentlyDeleteNote: Note? = null
 
@@ -40,8 +42,8 @@ constructor(
     override fun onEvent(event: UIEvent) {
         when (event) {
             is UIEvent.Order -> {
-                if (state.value.noteOrder::class == event.noteOrder::class &&
-                    state.value.noteOrder.orderType == event.noteOrder.orderType
+                if (noteState.noteOrder::class == event.noteOrder::class &&
+                    noteState.noteOrder.orderType == event.noteOrder.orderType
                 )
                     return
                 getNotes(event.noteOrder)
@@ -59,8 +61,8 @@ constructor(
                 }
             }
             is UIEvent.ToggleOrderSection -> {
-                _state.value = state.value.copy(
-                    isOrderSectionVisible = !state.value.isOrderSectionVisible
+                _noteState = noteState.copy(
+                    isOrderSectionVisible = !noteState.isOrderSectionVisible
                 )
             }
         }
@@ -70,7 +72,7 @@ constructor(
         getNotesJob?.cancel()
         getNotesJob = getNotesUseCase(noteOrder)
             .onEach { notes ->
-                _state.value = state.value.copy(
+                _noteState = noteState.copy(
                     notes = notes,
                     noteOrder = noteOrder
                 )
@@ -78,7 +80,7 @@ constructor(
             .launchIn(viewModelScope)
     }
 
-    sealed class UIState
+    sealed class UIAction
 
     sealed class UIEvent {
         data class Order(val noteOrder: NoteOrder) : UIEvent()

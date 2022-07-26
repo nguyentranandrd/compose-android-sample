@@ -11,7 +11,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -31,14 +34,15 @@ fun AddEditNoteScreen(
     noteColor: Int,
     viewModel: AddEditNoteViewModel = hiltViewModel()
 ) {
-    val titleState = viewModel.noteTitle.value
-    val contentState = viewModel.noteContent.value
+
+
+    val noteUiState = viewModel.noteUiState
 
     val scaffoldState = rememberScaffoldState()
 
     val noteBackgroundAnimatable = remember {
         Animatable(
-            Color(if (noteColor != -1) noteColor else viewModel.noteColor.value)
+            Color(if (noteColor != -1) noteColor else viewModel.noteUiState.color)
         )
     }
 
@@ -50,10 +54,10 @@ fun AddEditNoteScreen(
         // }, [scaffoldState.snackBarHostState])
         viewModel.eventFlow.collectLatest {
             when (it) {
-                is AddEditNoteViewModel.UIState.ShowSnackBar -> {
+                is AddEditNoteViewModel.UIAction.ShowSnackBar -> {
                     scaffoldState.snackbarHostState.showSnackbar(message = it.message)
                 }
-                is AddEditNoteViewModel.UIState.BackToNotesScreen -> {
+                is AddEditNoteViewModel.UIAction.BackToNotesScreen -> {
                     navController.navigateUp()
                 }
             }
@@ -68,7 +72,7 @@ fun AddEditNoteScreen(
             }, backgroundColor = MaterialTheme.colors.primary) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Save Note")
             }
-        },
+        }, scaffoldState = scaffoldState
     ) {
         Column(
             modifier = Modifier
@@ -92,7 +96,7 @@ fun AddEditNoteScreen(
                             .background(it)
                             .border(
                                 width = 3.dp,
-                                color = if (viewModel.noteColor.value == colorInt) Color.Black else Color.Transparent,
+                                color = if (noteUiState.color == colorInt) Color.Black else Color.Transparent,
                                 shape = CircleShape
                             )
                             .clickable {
@@ -109,34 +113,33 @@ fun AddEditNoteScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
             TransparentHintTextField(
-                text = titleState.text,
-                hint = titleState.hint,
+                text = noteUiState.title.text,
+                hint = noteUiState.title.hint,
                 onValueChange = {
                     viewModel.onEvent(AddEditNoteViewModel.UIEvent.EnteredTitle(it))
                 },
                 onFocusChange = {
                     viewModel.onEvent(AddEditNoteViewModel.UIEvent.ChangeTitleFocus(it))
                 },
-                isHintVisible = titleState.isHintVisible,
+                isHintVisible = noteUiState.title.isHintVisible,
                 singleLine = true,
                 textStyle = MaterialTheme.typography.h5
             )
             Spacer(modifier = Modifier.height(16.dp))
             TransparentHintTextField(
-                text = contentState.text,
-                hint = contentState.hint,
+                text = noteUiState.content.text,
+                hint = noteUiState.content.hint,
                 onValueChange = {
                     viewModel.onEvent(AddEditNoteViewModel.UIEvent.EnteredContent(it))
                 },
                 onFocusChange = {
                     viewModel.onEvent(AddEditNoteViewModel.UIEvent.ChangeContentFocus(it))
                 },
-                isHintVisible = contentState.isHintVisible,
+                isHintVisible = noteUiState.content.isHintVisible,
                 textStyle = MaterialTheme.typography.body1,
                 modifier = Modifier.fillMaxHeight()
             )
             Spacer(modifier = Modifier.height(16.dp))
-
         }
     }
 

@@ -22,8 +22,8 @@ import com.capt.cleanarchitecturenoteapp.feature_note.presentation.util.Screen
 import kotlinx.coroutines.launch
 
 @Composable
-fun NoteScreen(navController: NavController, viewModel: NotesViewModel = hiltViewModel()) {
-    val state = viewModel.state.value
+fun NotesScreen(navController: NavController, viewModel: NotesViewModel = hiltViewModel()) {
+    val state = viewModel.noteState
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
